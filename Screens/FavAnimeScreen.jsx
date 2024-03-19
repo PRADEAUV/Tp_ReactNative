@@ -18,6 +18,13 @@ export default function FavAnimeScreen() {
         }
     };
     let List=()=>{
+        if(user.animes.length==0){
+            return(<Text style={styles.text} >No fav anime saved </Text>)
+        }else
+        {
+
+        
+
         return(
             <ScrollView contentContainerStyle={styles.scrollView}>
         {user.animes.map((anime, index) => (
@@ -48,7 +55,7 @@ export default function FavAnimeScreen() {
             ))}
         </ScrollView>
         )
-
+    }
     }
 
     return (
