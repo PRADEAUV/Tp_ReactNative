@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, SafeAreaView, StyleSheet, TouchableOpacity, Image,Platform,ScrollView } from 'react-native';
+import { View, Text, SafeAreaView, StyleSheet, TouchableOpacity, Image,Platform,ScrollView,Modal } from 'react-native';
 import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
 import { useDispatch, useSelector } from 'react-redux';
 import { useState } from 'react';
@@ -7,8 +7,8 @@ import { addAnime,RemoveAnime } from '../reducers/user';
 export default function FavAnimeScreen() {
     const dispatch = useDispatch();
     const user = useSelector(state => state.user.value);
-    
-    
+    const [SelectedAnime,setSelectedAnime]=useState(null);
+    const [isModalVisible,setIsModalVisible]=useState(false);
     
     const toggleFav = (anime) => {
         if (user.animes.some((favAnime) => favAnime.title === anime.title)) {
@@ -17,6 +17,12 @@ export default function FavAnimeScreen() {
             dispatch(addAnime(anime));
         }
     };
+    const OpenModal=(anime)=>{
+        console.log(anime);
+        setIsModalVisible(true);
+        setSelectedAnime(anime);
+        
+      } 
     let List=()=>{
         if(user.animes.length==0){
             return(<Text style={styles.text} >No fav anime saved </Text>)
@@ -46,11 +52,7 @@ export default function FavAnimeScreen() {
                     <Text style={styles.textCard}> Score: {anime.score}</Text>
                 </View>
             </View>
-            <View style={styles.see}>
-                <TouchableOpacity style={styles.button}>
-                    <Text style={styles.textButton}>See more</Text>
-                </TouchableOpacity>
-                </View>
+            <View style={styles.see}><TouchableOpacity style={styles.button}><Text style={styles.textButton} onPress={()=>OpenModal(anime)} >See more</Text></TouchableOpacity></View>
             </View>
             ))}
         </ScrollView>
@@ -60,6 +62,28 @@ export default function FavAnimeScreen() {
 
     return (
     <SafeAreaView style={styles.container}>
+        <Modal  visible={isModalVisible} transparent animationType="fade">
+                    <ScrollView contentContainerStyle={styles.scrollView}>  
+                      <View style={styles.modalContainer}>
+                        <View style={styles.modalContent}>
+                          <Text style={styles.titleCard}>{SelectedAnime?.title}</Text>
+                          <Image style={styles.imageModal} source={{ uri: SelectedAnime?.images.jpg.large_image_url }} />
+                          <Text style={styles.textCard}> Année: {SelectedAnime?.year ? SelectedAnime.year : "inconnue"}</Text>
+                          <Text style={styles.textCard}> Genre: {SelectedAnime?.genres[0].name}</Text>
+                          <Text style={styles.textCard}> Score: {SelectedAnime?.score}</Text>
+                          <Text style={styles.synopsis}>{SelectedAnime?.synopsis}</Text> 
+                          <TouchableOpacity
+                            style={styles.closeButton}
+                            onPress={() => {setIsModalVisible(false);
+                            
+                            }}
+                          >
+                            <Text style={styles.textButton}>Close</Text>
+                          </TouchableOpacity>
+                        </View>
+                      </View>
+                      </ScrollView>
+                    </Modal>
         <View>
             <Text style={styles.title}>Favorite Anime</Text>
             <Text style={styles.text}>You're logged as {user.userName}</Text>
@@ -160,5 +184,36 @@ const styles = StyleSheet.create({
         fontSize: 20,
         textAlign: 'center',
         marginBottom:20,
+      },
+      modalContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        width: '100%',
+        height:"100%",
+        
+      },
+      modalContent: {
+        width: '100%',
+        height:"100%",
+        backgroundColor: 'white',
+        padding: 20,
+        borderRadius: 10,
+      },
+      synopsis: {
+        marginTop: 10,
+        fontSize: 16,
+        lineHeight: 22,
+      },
+      closeButton: {
+        backgroundColor: '#8953c2',
+        paddingVertical: 10,
+        borderRadius: 10,
+        marginTop: 20,
+      },
+      imageModal: {
+        width: 200,
+        height:250,
+        marginLeft:15,
       },
   });
