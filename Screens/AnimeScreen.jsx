@@ -8,6 +8,7 @@ export default function AnimeScreen() {
     const[animeList,setAnimeList]=useState([]);
     const user=useSelector((state)=>state.user.value);
     const [isModalVisible,setIsModalVisible]=useState(false);
+    
     useEffect(()=>{
         const data=async()=>{
             try{
@@ -21,12 +22,47 @@ export default function AnimeScreen() {
         data();
     },[]);
     const toggleFav = (anime) => {
+      
         if (user.animes.some((favAnime) => favAnime.title === anime.title)) {
             dispatch(RemoveAnime(anime));
         } else {
             dispatch(addAnime(anime));
         }
     };
+   
+
+    const OpenModal=(anime)=>{
+      console.log(anime);
+      setIsModalVisible(true);
+      console.log(isModalVisible);
+
+        return(
+        <Modal  visible={isModalVisible} transparent animationType="fade">
+                    <ScrollView contentContainerStyle={styles.scrollView}>  
+                      <View style={styles.modalContainer}>
+                        <View style={styles.modalContent}>
+                          <Text style={styles.titleCard}>{  anime.title}</Text>
+                          <Image style={styles.imageModal} source={{ uri: anime.images.jpg.large_image_url }} />
+                          <Text style={styles.textCard}> Année: {anime.year ? anime.year : "inconnue"}</Text>
+                          <Text style={styles.textCard}> Genre: {anime.genres[0].name}</Text>
+                          <Text style={styles.textCard}> Score: {anime.score}</Text>
+                          <Text style={styles.synopsis}>{anime.synopsis}</Text> 
+                          <TouchableOpacity
+                            style={styles.closeButton}
+                            onPress={() => {setIsModalVisible(false);
+                            setSelectedAnime(null)}}
+                          >
+                            <Text style={styles.textButton}>Close</Text>
+                          </TouchableOpacity>
+                        </View>
+                      </View>
+                      </ScrollView>
+                    </Modal>
+      )} 
+      
+      
+    
+
     const List=({animeList})=>{
       
         return (
@@ -34,7 +70,7 @@ export default function AnimeScreen() {
               {animeList.map((anime, index) => (
                 
                 <View key={index} style={styles.animeCard}>
-                    <Modal visible={isModalVisible} transparent animationType="fade">
+                    <Modal  visible={isModalVisible} transparent animationType="fade">
                     <ScrollView contentContainerStyle={styles.scrollView}>  
                       <View style={styles.modalContainer}>
                         <View style={styles.modalContent}>
@@ -78,7 +114,7 @@ export default function AnimeScreen() {
                     
                     
                     </View>
-                    <View style={styles.see}><TouchableOpacity style={styles.button}><Text style={styles.textButton} onPress={() => setIsModalVisible(true)} >See more</Text></TouchableOpacity></View>
+                    <View style={styles.see}><TouchableOpacity style={styles.button}><Text style={styles.textButton} onPress={()=>OpenModal(anime)} >See more</Text></TouchableOpacity></View>
                     
                 </View>
               ))}
